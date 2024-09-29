@@ -3,12 +3,10 @@ import { SignUpService } from "./sign-up.service";
 import {
   ApiBadRequestResponse,
   ApiExtraModels,
-  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
   refs,
 } from "@nestjs/swagger";
 import {
@@ -17,11 +15,7 @@ import {
   OPEN_API_TAGS,
 } from "src/core/constants/constants";
 
-import {
-  ForbiddenError,
-  InternalServerError,
-  UnauthorizedError,
-} from "src/core/errors/open-api-error";
+import { InternalServerError } from "src/core/errors/open-api-error";
 import {
   SignUpDto,
   SignUpDuplicateError,
@@ -50,15 +44,9 @@ export class SignUpController {
   @ApiInternalServerErrorResponse({
     type: InternalServerError,
   })
-  @ApiForbiddenResponse({
-    type: ForbiddenError,
-  })
-  @ApiUnauthorizedResponse({
-    type: UnauthorizedError,
-  })
   @HttpCode(200)
   @Post()
-  async signUp(@Body() signUpData: SignUpDto): Promise<any> {
+  async signUp(@Body() signUpData: SignUpDto): Promise<SignUpSuccess> {
     return this.signUpService.signUp(signUpData);
   }
 }

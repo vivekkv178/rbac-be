@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
 import { IsNotEmpty, IsEmail, IsString } from "class-validator";
+import { SIGN_UP_ERRORS } from "../sign-up/sign-up.responses";
 
 export class SignUpDto {
   @ApiProperty({ description: "The name of the user", example: "John" })
@@ -24,39 +25,48 @@ export class SignUpDto {
   })
   @IsNotEmpty()
   @Expose()
+  @IsString()
   password: string;
 }
 
 export class SignUpSuccess {
   @ApiPropertyOptional({
-    description: "Success Message",
-    example: "User Added Successfully.",
+    description: "Access Token",
+    example:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmY4ZDc5NDdiODM4YTZmNjAzOTZiODUiLCJlbWFpbCI6InN1cGVyYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3Mjc1ODQxNDgsImV4cCI6MTcyNzU4Nzc0OH0.7gnEG7p3YiTE2dTUOAXDagC_fLQXNcAfMJDrMXTwA4Y",
   })
-  message: string;
+  access_token: string;
 }
 
 export class SignUpDuplicateError {
   @ApiPropertyOptional({
     description: "Error Message",
-    example: "User Name already exists.",
+    example: SIGN_UP_ERRORS.DUPLICATE_ERROR.message,
   })
   message: string;
   @ApiPropertyOptional({
-    description: "Ecomm Error Code",
-    example: "RBAC_ERR_USER_100",
+    description: "Error Code",
+    example: SIGN_UP_ERRORS.DUPLICATE_ERROR.errorCode,
   })
-  ecommErrorCode: string;
+  errorCode: string;
 }
 
 export class SignUpValidationError {
   @ApiPropertyOptional({
     description: "Validation Errors",
-    example: ["name should not be empty"],
+    example: [
+      "name must be a string",
+      "name should not be empty",
+      "email must be an email",
+      "email should not be empty",
+      "password must be a string",
+      "password should not be empty",
+    ],
   })
   message: string[];
   @ApiPropertyOptional({
-    description: "Ecomm Error Code",
-    example: "RBAC_ERR_103",
+    description: "Error Code",
+    example: "API_ERR_103",
   })
-  ecommErrorCode: string;
+  errorCode: string;
 }

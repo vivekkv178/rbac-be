@@ -1,4 +1,3 @@
-import { RBAC } from "./../../project-manager/lib/constants";
 import { Module } from "@nestjs/common";
 import { DocsModule } from "./docs/docs.module";
 import { CoreModule } from "./core/core.module";
@@ -21,7 +20,7 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
       name: DATABASE_RBAC,
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
-        configService.get(`${DATABASES}.${RBAC}`),
+        configService.get(`${DATABASES}.${DATABASE_RBAC}`),
     }),
     JwtModule.register({
       global: true,

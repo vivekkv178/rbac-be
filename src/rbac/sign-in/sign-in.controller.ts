@@ -3,12 +3,10 @@ import { SignInService } from "./sign-in.service";
 import {
   ApiBadRequestResponse,
   ApiExtraModels,
-  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
   refs,
 } from "@nestjs/swagger";
 import {
@@ -16,48 +14,38 @@ import {
   OPEN_API_RESOURCES,
   OPEN_API_TAGS,
 } from "src/core/constants/constants";
-
+import { InternalServerError } from "src/core/errors/open-api-error";
 import {
-  ForbiddenError,
-  InternalServerError,
-  UnauthorizedError,
-} from "src/core/errors/open-api-error";
-import {
-  CreateUserDuplicateError,
-  CreateUserValidationError,
-} from "../dto/user.dto";
-import { SignInDto, SignInSuccess } from "../dto/sign-in.dto";
+  NotRegisteredError,
+  SignInDto,
+  SignInSuccess,
+  SignInValidationError,
+} from "../dto/sign-in.dto";
 
 @ApiTags(OPEN_API_TAGS.AUTH)
 @Controller(`${OPEN_API_RESOURCES.AUTH}${OPEN_API_PATHS.SIGN_IN}`)
 export class SignInController {
   constructor(private readonly signInService: SignInService) {}
   @ApiOperation({
-    description: "Creates an user",
+    description: "Enables user Sign in to the app.",
     summary: "Sign In",
   })
   @ApiResponse({
     type: SignInSuccess,
     status: 200,
   })
-  @ApiExtraModels(CreateUserDuplicateError, CreateUserValidationError)
+  @ApiExtraModels(SignInValidationError, NotRegisteredError)
   @ApiBadRequestResponse({
     schema: {
-      anyOf: refs(CreateUserDuplicateError, CreateUserValidationError),
+      anyOf: refs(SignInValidationError, NotRegisteredError),
     },
   })
   @ApiInternalServerErrorResponse({
     type: InternalServerError,
   })
-  @ApiForbiddenResponse({
-    type: ForbiddenError,
-  })
-  @ApiUnauthorizedResponse({
-    type: UnauthorizedError,
-  })
   @HttpCode(200)
   @Post()
-  async signIn(@Body() signInData: SignInDto): Promise<any> {
+  async signIn(@Body() signInData: SignInDto): Promise<SignInSuccess> {
     return this.signInService.signIn(signInData);
   }
 }

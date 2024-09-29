@@ -13,3 +13,18 @@ export const USER_ERRORS: {
     errorCode: "RBAC_ERR_USER_100",
   },
 };
+
+export const USER_RESPONSES = {
+  CREATE_SUCCESS: {
+    message: "User Created Successfully.",
+    status: 200,
+  },
+  UPDATE_SUCCESS: {
+    message: "User Updated Successfully.",
+    status: 200,
+  },
+  DELETE_SUCCESS: {
+    message: "User Deleted Successfully.",
+    status: 200,
+  },
+};

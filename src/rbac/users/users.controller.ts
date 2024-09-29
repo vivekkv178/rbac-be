@@ -15,7 +15,9 @@ import {
   ApiExtraModels,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -32,16 +34,21 @@ import {
 import {
   ForbiddenError,
   InternalServerError,
+  NotFoundError,
   UnauthorizedError,
 } from "src/core/errors/open-api-error";
-import { User } from "../entities/user.entity";
 import {
   CreateUserDto,
   CreateUserDuplicateError,
   CreateUserSuccess,
   CreateUserValidationError,
+  DeleteUserSuccess,
   GetUserDto,
+  GetUserSuccess,
   UpdateUserDto,
+  UpdateUserSuccess,
+  UpdateUserValidationError,
+  UserList,
 } from "../dto/user.dto";
 import { Roles } from "src/core/decorators/roles/roles.decorator";
 import { AuthGuard } from "src/core/guards/auth/auth.guard";
@@ -83,25 +90,107 @@ export class UsersController {
     return this.usersService.create(userData);
   }
 
+  @ApiOperation({
+    description: "User can list all the users registered in the app.",
+    summary: "Users - List",
+  })
+  @ApiResponse({
+    type: UserList,
+    status: 200,
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerError,
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedError,
+  })
+  @HttpCode(200)
   @Get()
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserList> {
     return this.usersService.findAll();
   }
 
+  @ApiOperation({
+    description:
+      "User can get all the details of a user registered in the app.",
+    summary: "Users - Get",
+  })
+  @ApiResponse({
+    type: UserList,
+    status: 200,
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerError,
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedError,
+  })
+  @ApiNotFoundResponse({ type: NotFoundError })
+  @HttpCode(200)
   @Get(":email")
-  async findByEmail(@Param() params: GetUserDto): Promise<User> {
+  async findByEmail(@Param() params: GetUserDto): Promise<GetUserSuccess> {
     return this.usersService.findByEmail(params.email);
   }
 
+  @ApiOperation({
+    description: "Super Admins and Admins are allowed to update a user.",
+    summary: "Users - Update",
+  })
+  @ApiResponse({
+    type: UpdateUserSuccess,
+    status: 200,
+  })
+  @ApiExtraModels(UpdateUserValidationError)
+  @ApiBadRequestResponse({
+    schema: {
+      anyOf: refs(UpdateUserValidationError),
+    },
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerError,
+  })
+  @ApiForbiddenResponse({
+    type: ForbiddenError,
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedError,
+  })
+  @ApiNotFoundResponse({ type: NotFoundError })
+  @HttpCode(200)
   @Put()
   @Roles(UserAccessRole.SUPER_ADMIN, UserAccessRole.ADMIN)
-  async update(@Body() userData: UpdateUserDto): Promise<User> {
+  async update(@Body() userData: UpdateUserDto): Promise<UpdateUserSuccess> {
     return this.usersService.update(userData);
   }
 
+  @ApiOperation({
+    description: "Super Admins are allowed to delete a user.",
+    summary: "Users - Delete",
+  })
+  @ApiResponse({
+    type: DeleteUserSuccess,
+    status: 200,
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerError,
+  })
+  @ApiForbiddenResponse({
+    type: ForbiddenError,
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedError,
+  })
+  @ApiNotFoundResponse({ type: NotFoundError })
+  @HttpCode(200)
+  @ApiParam({
+    name: "email",
+    description: "Email of the user to be deleted.",
+    required: true,
+    example: "john@example.com",
+  })
   @Delete(":email")
   @Roles(UserAccessRole.SUPER_ADMIN)
-  async delete(@Param("email") email: string): Promise<void> {
+  async delete(@Param("email") email: string): Promise<DeleteUserSuccess> {
     return this.usersService.delete(email);
   }
 }

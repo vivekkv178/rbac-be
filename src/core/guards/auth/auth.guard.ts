@@ -52,9 +52,13 @@ export class AuthGuard implements CanActivate {
         const tokenData = this.jwtService.decode(token);
         const userData = await this.userService.findByEmail(tokenData?.email);
         return { userData, tokenData };
+      } else {
+        throw new OpenApiError(OPEN_API_ERRORS.INVALID_API_KEY);
       }
-    } catch (error) {
-      throw new OpenApiError(OPEN_API_ERRORS.FORBIDDEN_ERROR);
+    } catch (error: any) {
+      if (error?.errorCode === OPEN_API_ERRORS.INVALID_API_KEY.errorCode)
+        throw new OpenApiError(OPEN_API_ERRORS.INVALID_API_KEY);
+      else throw new OpenApiError(OPEN_API_ERRORS.FORBIDDEN_ERROR);
     }
   }
 }

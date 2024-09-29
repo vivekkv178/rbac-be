@@ -7,6 +7,7 @@ import { plainToInstance } from "class-transformer";
 import { CreateUserSuccess } from "../dto/user.dto";
 import { OpenApiError } from "src/core/errors/open-api-error";
 import { OPEN_API_ERRORS } from "src/core/errors/open-api.errors";
+import { SIGN_IN_ERRORS } from "./sign-in.responses";
 
 @Injectable()
 export class SignInService {
@@ -18,7 +19,11 @@ export class SignInService {
 
   async signIn(signInData: SignInDto) {
     try {
-      const userData = await this.usersService.findByEmail(signInData?.email);
+      const userData = await this.usersService.getUserDetails(
+        signInData?.email,
+      );
+      if (!userData)
+        throw new OpenApiError(SIGN_IN_ERRORS.NOT_REGISTERED_ERROR);
       const passwordMatched = await this.passHashService.comparePassword(
         signInData?.password,
         userData?.password,
@@ -28,8 +33,10 @@ export class SignInService {
       const user = plainToInstance(CreateUserSuccess, userData);
       const token = await this.tokenService.createToken(user);
       return { access_token: token };
-    } catch (error) {
-      throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
+    } catch (error: any) {
+      if (error?.errorCode === SIGN_IN_ERRORS.NOT_REGISTERED_ERROR?.errorCode)
+        throw new OpenApiError(SIGN_IN_ERRORS.NOT_REGISTERED_ERROR);
+      else throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
     }
   }
 }
