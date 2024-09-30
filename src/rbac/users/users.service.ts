@@ -89,7 +89,8 @@ export class UsersService {
     try {
       const existingUser = await this.getUserDetails(userData?.email);
 
-      if (existingUser) throw new OpenApiError(USER_ERRORS.DUPLICATE_ERROR);
+      if (existingUser && existingUser.is_registered)
+        throw new OpenApiError(USER_ERRORS.DUPLICATE_ERROR);
 
       const newUser = this.userRepository.create(data);
       const user = this.userRepository.save(newUser);
