@@ -17,7 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e": "jest --config ./test/jest-e2e.json --forceExit",
     "resource": "nest g res ./openapi/organizations",
     "new-api": "nest g controller openapi/users && nest g service openapi/users",
     "migration:create": "typeorm migration:create ./src/core/migrations/openapi/ecomm-v2",

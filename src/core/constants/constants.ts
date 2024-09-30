@@ -5,6 +5,10 @@ export const OPEN_API_TAGS = {
   API_TOKEN_HEADER: "ApiTokenHeader",
 };
 
+export const OPEN_API_VERSIONS = {
+  V1: "/v1",
+};
+
 export const OPEN_API_RESOURCES = {
   CONFIG: "/config",
   AUTH: "/auth",
