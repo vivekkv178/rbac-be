@@ -47,6 +47,7 @@ export class AuthGuard implements CanActivate {
       ) {
         const header = request.headers[tokenHeader] as string;
         const token = header.split(" ")[1];
+        this.logger.debug(`Accesing ${request.url} for token ${token}`);
         this.jwtService.verify(token);
 
         const tokenData = this.jwtService.decode(token);
@@ -56,6 +57,7 @@ export class AuthGuard implements CanActivate {
         throw new OpenApiError(OPEN_API_ERRORS.INVALID_API_KEY);
       }
     } catch (error: any) {
+      this.logger.debug(`Error from getUser`, error);
       if (error?.errorCode === OPEN_API_ERRORS.INVALID_API_KEY.errorCode)
         throw new OpenApiError(OPEN_API_ERRORS.INVALID_API_KEY);
       else throw new OpenApiError(OPEN_API_ERRORS.FORBIDDEN_ERROR);

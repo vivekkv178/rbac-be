@@ -17,6 +17,7 @@ import {
 import { InternalServerError } from "src/core/errors/open-api-error";
 import {
   NotRegisteredError,
+  PasswordError,
   SignInDto,
   SignInSuccess,
   SignInValidationError,
@@ -34,10 +35,10 @@ export class SignInController {
     type: SignInSuccess,
     status: 200,
   })
-  @ApiExtraModels(SignInValidationError, NotRegisteredError)
+  @ApiExtraModels(SignInValidationError, NotRegisteredError, PasswordError)
   @ApiBadRequestResponse({
     schema: {
-      anyOf: refs(SignInValidationError, NotRegisteredError),
+      anyOf: refs(SignInValidationError, NotRegisteredError, PasswordError),
     },
   })
   @ApiInternalServerErrorResponse({

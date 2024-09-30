@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DATABASE_RBAC } from "src/core/config/databases";
@@ -20,6 +20,7 @@ import { OPEN_API_ERRORS } from "src/core/errors/open-api.errors";
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   constructor(
     @InjectRepository(User, DATABASE_RBAC)
     private readonly userRepository: Repository<User>,
@@ -41,6 +42,7 @@ export class UsersService {
 
       return userList;
     } catch (error) {
+      this.logger.debug("findAll", error);
       throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
     }
   }
@@ -61,6 +63,7 @@ export class UsersService {
 
       return userDetails;
     } catch (error) {
+      this.logger.debug("findByEmail", error);
       if (error?.errorCode === OPEN_API_ERRORS.NOT_FOUND_ERROR.errorCode)
         throw new OpenApiError(OPEN_API_ERRORS.NOT_FOUND_ERROR);
       throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
@@ -76,6 +79,7 @@ export class UsersService {
       });
       return user;
     } catch (error) {
+      this.logger.debug("getUserDetails", error);
       throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
     }
   }
@@ -97,6 +101,7 @@ export class UsersService {
 
       return response;
     } catch (error) {
+      this.logger.debug("create", error);
       if (error?.errorCode === USER_ERRORS.DUPLICATE_ERROR.errorCode)
         throw new OpenApiError(USER_ERRORS.DUPLICATE_ERROR);
       else throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
@@ -111,6 +116,7 @@ export class UsersService {
       await this.userRepository.save(updatedUser);
       return USER_RESPONSES.UPDATE_SUCCESS;
     } catch (error) {
+      this.logger.debug("update", error);
       if (error?.errorCode === OPEN_API_ERRORS.NOT_FOUND_ERROR.errorCode)
         throw new OpenApiError(OPEN_API_ERRORS.NOT_FOUND_ERROR);
       throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
@@ -123,6 +129,7 @@ export class UsersService {
       await this.userRepository.delete(user._id);
       return USER_RESPONSES.DELETE_SUCCESS;
     } catch (error) {
+      this.logger.debug("delete", error);
       if (error?.errorCode === OPEN_API_ERRORS.NOT_FOUND_ERROR.errorCode)
         throw new OpenApiError(OPEN_API_ERRORS.NOT_FOUND_ERROR);
       throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);

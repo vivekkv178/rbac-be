@@ -62,3 +62,16 @@ export class NotRegisteredError {
   })
   errorCode: string;
 }
+
+export class PasswordError {
+  @ApiPropertyOptional({
+    description: "Message",
+    example: SIGN_IN_ERRORS.PASSWORD_ERROR.message,
+  })
+  message: string;
+  @ApiPropertyOptional({
+    description: "Error Code",
+    example: SIGN_IN_ERRORS.PASSWORD_ERROR.errorCode,
+  })
+  errorCode: string;
+}

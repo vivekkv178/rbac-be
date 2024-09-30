@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { CreateUserDto } from "../dto/user.dto";
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { UsersService } from "../users/users.service";
-import { SignUpDto } from "../dto/sign-up.dto";
+import { SignUpDto, SignUpSuccess } from "../dto/sign-up.dto";
 import { OpenApiError } from "src/core/errors/open-api-error";
 import { SIGN_UP_ERRORS } from "./sign-up.responses";
 import { USER_ERRORS } from "../users/users.responses";
@@ -13,13 +13,14 @@ import { UserAccessRole } from "src/core/constants/constants";
 
 @Injectable()
 export class SignUpService {
+  private readonly logger = new Logger(SignUpService.name);
   constructor(
     private usersService: UsersService,
     private tokenService: TokenCreateService,
     private passHashService: PassHashService,
   ) {}
 
-  async signUp(signUpData: SignUpDto): Promise<any> {
+  async signUp(signUpData: SignUpDto): Promise<SignUpSuccess> {
     const data = instanceToPlain(signUpData);
     data.is_registered = true;
     data.access_role = UserAccessRole.USER;
@@ -36,6 +37,7 @@ export class SignUpService {
       const token = await this.tokenService.createToken(user);
       return { access_token: token };
     } catch (error) {
+      this.logger.debug("signUp", error);
       if (error?.errorCode === USER_ERRORS.DUPLICATE_ERROR.errorCode)
         throw new OpenApiError(SIGN_UP_ERRORS.DUPLICATE_ERROR);
       else throw new OpenApiError(OPEN_API_ERRORS.INTERNAL_SERVER_ERROR);
